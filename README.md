@@ -53,13 +53,7 @@ docker-compose up -d --build
 cd backend
 npx prisma migrate deploy
 
-# IMPORTANT: Run role migration for existing users
-node scripts/migration_role.js
-
-# Run status migration
-node scripts/migration_status.js
-
-# Seed database (optional)
+# Seed database (create default users)
 npx prisma db seed
 ```
 
