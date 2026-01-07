@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import Button from '../../../components/ui/Button';
 import Badge from '../../../components/ui/Badge';
-import { UploadCloud, CheckCircle, FileText, AlertCircle } from 'lucide-react';
+import Alert from '../../../components/ui/Alert';
+import { UploadCloud, CheckCircle, FileText, AlertCircle, Download, Info } from 'lucide-react';
 import api from '../../../services/api';
 
 const FileInput = ({ label, name, file, onChange, error, required, existingFile }) => (
@@ -303,6 +304,41 @@ const Step2Docs = ({ files, handleFileChange, onNext, onPrev, mouScenario }) => 
                     <p className="text-xs text-blue-600 mt-2">Upload dokumen sesuai dengan persyaratan opsi ini.</p>
                 </div>
             )}
+
+            {/* Template Documents Download Section */}
+            <Alert variant="info" className="border-blue-200 bg-blue-50">
+                <div className="flex items-start gap-3">
+                    <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                        <h4 className="font-semibold text-blue-900 mb-1">Template Formulir</h4>
+                        <p className="text-sm text-blue-700 mb-3">
+                            Unduh template formulir yang diperlukan untuk melengkapi dokumen:
+                        </p>
+                        <div className="flex flex-wrap gap-3">
+                            <a
+                                href={`${import.meta.env.VITE_API_BASE_URL?.replace('/api/v1', '') || 'http://localhost:3100'}/templates/f103-perpindahan-penduduk.pdf`}
+                                download
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-white rounded-lg border border-blue-300 hover:bg-blue-100 hover:border-blue-400 transition-all shadow-sm hover:shadow"
+                            >
+                                <Download className="w-4 h-4 text-blue-600" />
+                                <span className="text-sm font-medium text-blue-900">F.1-03 Perpindahan Penduduk</span>
+                            </a>
+                            <a
+                                href={`${import.meta.env.VITE_API_BASE_URL?.replace('/api/v1', '') || 'http://localhost:3100'}/templates/f106-perubahan-data.pdf`}
+                                download
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-white rounded-lg border border-blue-300 hover:bg-blue-100 hover:border-blue-400 transition-all shadow-sm hover:shadow"
+                            >
+                                <Download className="w-4 h-4 text-blue-600" />
+                                <span className="text-sm font-medium text-blue-900">F.1-06 Perubahan Data</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </Alert>
 
             {/* Loading State */}
             {loading && (
