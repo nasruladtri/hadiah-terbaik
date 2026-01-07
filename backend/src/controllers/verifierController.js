@@ -76,16 +76,18 @@ const approve = async (req, res) => {
 const reject = async (req, res) => {
     try {
         const { id } = req.params;
-        const { reason } = req.body;
+        // Accept both 'notes' and 'reason' for backwards compatibility
+        const { notes, reason } = req.body;
+        const rejectionReason = notes || reason;
 
-        if (!reason) {
+        if (!rejectionReason || rejectionReason.trim() === '') {
             return res.status(400).json({
                 success: false,
                 message: 'Alasan penolakan wajib diisi'
             });
         }
 
-        const result = await verifierService.rejectSubmission(id, req.user.id, reason);
+        const result = await verifierService.rejectSubmission(id, req.user.id, rejectionReason);
         res.json({
             success: true,
             message: 'Pengajuan ditolak',
