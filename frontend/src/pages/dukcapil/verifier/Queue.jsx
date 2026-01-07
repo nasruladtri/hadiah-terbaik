@@ -126,7 +126,7 @@ const VerifierQueue = () => {
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <Button onClick={() => navigate(`/dukcapil/verifier/verify/${item.id}`)}>
+                                        <Button onClick={() => navigate(`/dukcapil/verify/${item.id}`)}>
                                             Verifikasi
                                         </Button>
                                     </TableCell>

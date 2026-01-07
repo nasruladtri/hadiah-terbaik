@@ -68,14 +68,14 @@ const OperatorDashboard = () => {
                     value={stats.submitted}
                     icon={Users}
                     color="blue"
-                    onClick={() => navigate('/dukcapil/operator/queue')}
+                    onClick={() => navigate('/dukcapil/queue')}
                 />
                 <StatCard
                     title="Sedang Diproses"
                     value={stats.myProcessing}
                     icon={RefreshCcw}
                     color="amber"
-                    onClick={() => navigate('/dukcapil/operator/my-work')}
+                    onClick={() => navigate('/dukcapil/my-work')}
                 />
                 <StatCard
                     title="Dikirim Hari Ini"
@@ -131,7 +131,7 @@ const OperatorDashboard = () => {
                                                     <Button
                                                         size="sm"
                                                         variant={item.status === 'PROCESSING' ? 'primary' : 'outline'}
-                                                        onClick={() => navigate(`/dukcapil/operator/process/${item.id}`)}
+                                                        onClick={() => navigate(`/dukcapil/process/${item.id}`)}
                                                     >
                                                         {item.status === 'PROCESSING' ? 'Lanjut' : 'Lihat'}
                                                     </Button>
@@ -143,7 +143,7 @@ const OperatorDashboard = () => {
                             </Table>
                             {myQueue.length === 0 && (
                                 <div className="mt-4 text-center">
-                                    <Button variant="outline" onClick={() => navigate('/dukcapil/operator/queue')}>
+                                    <Button variant="outline" onClick={() => navigate('/dukcapil/queue')}>
                                         Ambil Antrian Baru
                                     </Button>
                                 </div>
@@ -188,14 +188,14 @@ const OperatorDashboard = () => {
                             <Button
                                 variant="secondary"
                                 className="w-full justify-start"
-                                onClick={() => navigate('/dukcapil/operator/queue')}
+                                onClick={() => navigate('/dukcapil/queue')}
                             >
                                 Lihat Antrian Masuk
                             </Button>
                             <Button
                                 variant="outline"
                                 className="w-full justify-start"
-                                onClick={() => navigate('/dukcapil/operator/my-work')}
+                                onClick={() => navigate('/dukcapil/my-work')}
                             >
                                 Pekerjaan Saya
                             </Button>

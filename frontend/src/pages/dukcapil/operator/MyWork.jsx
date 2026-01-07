@@ -88,7 +88,7 @@ const MyWork = () => {
                                     <TableCell className="text-right">
                                         <Button
                                             variant={item.status === 'PROCESSING' ? 'primary' : 'outline'}
-                                            onClick={() => navigate(`/dukcapil/operator/process/${item.id}`)}
+                                            onClick={() => navigate(`/dukcapil/process/${item.id}`)}
                                         >
                                             {item.status === 'PROCESSING' ? 'Lanjutkan' : 'Lihat'}
                                         </Button>
@@ -100,7 +100,7 @@ const MyWork = () => {
                 </Table>
                 {!loading && myQueue.length === 0 && (
                     <div className="p-4 text-center border-t border-slate-100">
-                        <Button variant="outline" onClick={() => navigate('/dukcapil/operator/queue')}>
+                        <Button variant="outline" onClick={() => navigate('/dukcapil/queue')}>
                             Ambil dari Antrian
                         </Button>
                     </div>

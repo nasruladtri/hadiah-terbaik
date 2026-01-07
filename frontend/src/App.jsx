@@ -51,8 +51,8 @@ const RootRedirect = () => {
 
     switch (user.role) {
         case 'KUA': return <Navigate to="/kua/dashboard" replace />;
-        case 'OPERATOR_DUKCAPIL': return <Navigate to="/dukcapil/operator/dashboard" replace />;
-        case 'VERIFIKATOR_DUKCAPIL': return <Navigate to="/dukcapil/verifier/dashboard" replace />;
+        case 'OPERATOR_DUKCAPIL': return <Navigate to="/dukcapil/dashboard" replace />;
+        case 'VERIFIKATOR_DUKCAPIL': return <Navigate to="/dukcapil/dashboard" replace />;
         case 'KEMENAG': return <Navigate to="/kemenag/dashboard" replace />;
         case 'ADMIN': return <Navigate to="/admin/dashboard" replace />;
         default: return <Navigate to="/auth/login" replace />;
@@ -145,61 +145,55 @@ function App() {
                                 />
                             </Route>
 
-                            {/* Dukcapil Routes */}
+                            {/* Dukcapil Routes - Unified Interface */}
                             <Route path="/dukcapil">
-                                {/* Operator */}
+                                {/* Dashboard - Both roles */}
                                 <Route
-                                    path="operator/dashboard"
+                                    path="dashboard"
                                     element={
-                                        <ProtectedRoute roles={['OPERATOR_DUKCAPIL']}>
+                                        <ProtectedRoute roles={['OPERATOR_DUKCAPIL', 'VERIFIKATOR_DUKCAPIL']}>
                                             <OperatorDashboard />
                                         </ProtectedRoute>
                                     }
                                 />
+
+                                {/* Operator Functions - Both roles can access */}
                                 <Route
-                                    path="operator/queue"
+                                    path="queue"
                                     element={
-                                        <ProtectedRoute roles={['OPERATOR_DUKCAPIL']}>
+                                        <ProtectedRoute roles={['OPERATOR_DUKCAPIL', 'VERIFIKATOR_DUKCAPIL']}>
                                             <OperatorQueue />
                                         </ProtectedRoute>
                                     }
                                 />
                                 <Route
-                                    path="operator/my-work"
+                                    path="my-work"
                                     element={
-                                        <ProtectedRoute roles={['OPERATOR_DUKCAPIL']}>
+                                        <ProtectedRoute roles={['OPERATOR_DUKCAPIL', 'VERIFIKATOR_DUKCAPIL']}>
                                             <OperatorMyWork />
                                         </ProtectedRoute>
                                     }
                                 />
                                 <Route
-                                    path="operator/history"
+                                    path="history"
                                     element={
-                                        <ProtectedRoute roles={['OPERATOR_DUKCAPIL']}>
+                                        <ProtectedRoute roles={['OPERATOR_DUKCAPIL', 'VERIFIKATOR_DUKCAPIL']}>
                                             <OperatorHistory />
                                         </ProtectedRoute>
                                     }
                                 />
                                 <Route
-                                    path="operator/process/:id"
+                                    path="process/:id"
                                     element={
-                                        <ProtectedRoute roles={['OPERATOR_DUKCAPIL']}>
+                                        <ProtectedRoute roles={['OPERATOR_DUKCAPIL', 'VERIFIKATOR_DUKCAPIL']}>
                                             <VerificationDetail />
                                         </ProtectedRoute>
                                     }
                                 />
 
-                                {/* Verifier */}
+                                {/* Verification Queue - Verifier only */}
                                 <Route
-                                    path="verifier/dashboard"
-                                    element={
-                                        <ProtectedRoute roles={['VERIFIKATOR_DUKCAPIL']}>
-                                            <VerifierDashboard />
-                                        </ProtectedRoute>
-                                    }
-                                />
-                                <Route
-                                    path="verifier/queue"
+                                    path="verification-queue"
                                     element={
                                         <ProtectedRoute roles={['VERIFIKATOR_DUKCAPIL']}>
                                             <VerifierQueue />
@@ -207,23 +201,7 @@ function App() {
                                     }
                                 />
                                 <Route
-                                    path="verifier/history"
-                                    element={
-                                        <ProtectedRoute roles={['VERIFIKATOR_DUKCAPIL']}>
-                                            <VerifierHistory />
-                                        </ProtectedRoute>
-                                    }
-                                />
-                                <Route
-                                    path="verifier/verify/:id"
-                                    element={
-                                        <ProtectedRoute roles={['VERIFIKATOR_DUKCAPIL']}>
-                                            <VerificationDetail />
-                                        </ProtectedRoute>
-                                    }
-                                />
-                                <Route
-                                    path="verifier/detail/:id"
+                                    path="verify/:id"
                                     element={
                                         <ProtectedRoute roles={['VERIFIKATOR_DUKCAPIL']}>
                                             <VerificationDetail />
@@ -233,7 +211,7 @@ function App() {
 
                                 {/* Shared */}
                                 <Route
-                                    path="verifications/:id"
+                                    path="submission/:id"
                                     element={
                                         <ProtectedRoute roles={['OPERATOR_DUKCAPIL', 'VERIFIKATOR_DUKCAPIL']}>
                                             <VerificationDetail />

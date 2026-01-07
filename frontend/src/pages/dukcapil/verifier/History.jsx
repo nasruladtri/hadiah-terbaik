@@ -150,7 +150,7 @@ const VerifierHistory = () => {
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            onClick={() => navigate(`/dukcapil/verifier/detail/${item.id}`)}
+                                            onClick={() => navigate(`/dukcapil/verify/${item.id}`)}
                                         >
                                             Detail
                                         </Button>

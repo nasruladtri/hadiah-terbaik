@@ -156,7 +156,7 @@ const History = () => {
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            onClick={() => navigate(`/dukcapil/operator/process/${item.id}`)}
+                                            onClick={() => navigate(`/dukcapil/process/${item.id}`)}
                                         >
                                             Detail
                                         </Button>

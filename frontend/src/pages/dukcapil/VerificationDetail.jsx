@@ -26,7 +26,7 @@ const VerificationDetail = () => {
         try {
             // Use role-specific endpoint
             const endpoint = user.role === 'OPERATOR_DUKCAPIL'
-                ? `/dukcapil/operator/submissions/${id}`
+                ? `/dukcapil/submissions/${id}`
                 : `/dukcapil/verifier/submissions/${id}`;
 
             const res = await api.get(endpoint);
@@ -91,14 +91,14 @@ const VerificationDetail = () => {
                     notes
                 });
                 toast.success('Pengajuan berhasil dikirim ke verifikator');
-                navigate('/dukcapil/operator/dashboard');
+                navigate('/dukcapil/dashboard');
             } else if (isOperator && decision === 'REJECTED') {
                 // Operator: Return to KUA
                 await api.post(`/dukcapil/operator/submissions/${id}/return`, {
                     reason: notes
                 });
                 toast.success('Pengajuan dikembalikan ke KUA');
-                navigate('/dukcapil/operator/dashboard');
+                navigate('/dukcapil/dashboard');
             } else if (isVerifier && decision === 'APPROVED') {
                 // Verifier: Approve
                 await api.post(`/dukcapil/verifier/submissions/${id}/approve`, {

@@ -44,19 +44,16 @@ const Sidebar = ({ onCloseMobile }) => {
                     { name: 'Akun', icon: User, path: '/kua/akun' },
                 ];
             case 'OPERATOR_DUKCAPIL':
-                return [
-                    { name: 'Dashboard', icon: LayoutDashboard, path: '/dukcapil/operator/dashboard' },
-                    { name: 'Antrian Pengajuan', icon: Files, path: '/dukcapil/operator/queue' },
-                    { name: 'Pekerjaan Saya', icon: CheckSquare, path: '/dukcapil/operator/my-work' },
-                    { name: 'Riwayat', icon: History, path: '/dukcapil/operator/history' },
-                    { name: 'Laporan', icon: BarChart3, path: '/dukcapil/laporan' },
-                    { name: 'Akun', icon: User, path: '/dukcapil/akun' },
-                ];
             case 'VERIFIKATOR_DUKCAPIL':
                 return [
-                    { name: 'Dashboard', icon: LayoutDashboard, path: '/dukcapil/verifier/dashboard' },
-                    { name: 'Antrian Verifikasi', icon: Files, path: '/dukcapil/verifier/queue' },
-                    { name: 'Riwayat Verifikasi', icon: History, path: '/dukcapil/verifier/history' },
+                    { name: 'Dashboard', icon: LayoutDashboard, path: '/dukcapil/dashboard' },
+                    { name: 'Antrian Pengajuan', icon: Files, path: '/dukcapil/queue' },
+                    { name: 'Pekerjaan Saya', icon: CheckSquare, path: '/dukcapil/my-work' },
+                    { name: 'Riwayat', icon: History, path: '/dukcapil/history' },
+                    // Verifier-only menu
+                    ...(role === 'VERIFIKATOR_DUKCAPIL' ? [
+                        { name: 'Antrian Verifikasi', icon: CheckSquare, path: '/dukcapil/verification-queue', badge: true }
+                    ] : []),
                     { name: 'Laporan', icon: BarChart3, path: '/dukcapil/laporan' },
                     { name: 'Akun', icon: User, path: '/dukcapil/akun' },
                 ];

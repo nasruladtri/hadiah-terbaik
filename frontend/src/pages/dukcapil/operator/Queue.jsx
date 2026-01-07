@@ -62,7 +62,7 @@ const OperatorQueue = () => {
     const currentItems = filteredQueue.slice(indexOfFirstItem, indexOfLastItem);
 
     const handleViewItem = (itemId) => {
-        navigate(`/dukcapil/operator/process/${itemId}`);
+        navigate(`/dukcapil/process/${itemId}`);
     };
 
     return (
