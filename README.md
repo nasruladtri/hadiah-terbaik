@@ -227,20 +227,52 @@ See [`docs/PORTAINER_DEPLOYMENT.md`](docs/PORTAINER_DEPLOYMENT.md) for detailed 
 
 ## 🔧 Environment Variables
 
-### Backend (.env)
+All environment variables are centrally managed in the **root `.env` file**. Copy `.env.example` to `.env` and configure for your environment:
+
+### Production Configuration
 
 ```env
-DATABASE_URL="postgresql://user:pass@db:5432/kua_dukcapil"
-JWT_SECRET="your-secret-key-here"
-PORT=3100
+# ================================
+# DATABASE CONFIGURATION
+# ================================
+DB_USER=postgres
+DB_PASS=your_secure_password_here
+DB_NAME=kua_dukcapil_db
+
+# ================================
+# BACKEND CONFIGURATION
+# ================================
+JWT_SECRET=your_strong_jwt_secret_key_here
 NODE_ENV=production
+PORT=3100
+CORS_ORIGIN=https://ht.nasruladitri.space
+
+# ================================
+# FRONTEND CONFIGURATION
+# ================================
+VITE_API_BASE_URL=https://api-ht.nasruladitri.space/api/v1
+
+# ================================
+# CLOUDFLARE TUNNEL
+# ================================
+TUNNEL_TOKEN=your_cloudflare_tunnel_token
 ```
 
-### Frontend (.env)
+### Development Configuration
 
 ```env
-VITE_API_URL=http://localhost:3100/api/v1
+DB_USER=postgres
+DB_PASS=postgres
+DB_NAME=kua_dukcapil_db
+JWT_SECRET=dev_secret_key
+NODE_ENV=development
+PORT=3100
+CORS_ORIGIN=http://localhost:2200
+VITE_API_BASE_URL=http://localhost:3100/api/v1
+TUNNEL_TOKEN=
 ```
+
+**Note**: All services (backend, frontend, database) read from the same root `.env` file. No need for separate env files in subdirectories.
 
 ## 📊 Monitoring
 
