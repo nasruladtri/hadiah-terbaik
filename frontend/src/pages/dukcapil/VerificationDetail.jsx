@@ -44,14 +44,18 @@ const VerificationDetail = () => {
         fetchDetail();
     }, [fetchDetail]);
 
+    // Define role checks FIRST before using them
+    const isOperator = user.role === 'OPERATOR_DUKCAPIL';
+    const isVerifier = user.role === 'VERIFIKATOR_DUKCAPIL';
+
+    // Verifiers can perform operator functions in unified interface
+    const canPerformOperatorFunctions = isOperator || isVerifier;
+
     const handleLock = async () => {
         setProcessing(true);
         try {
-            if (isOperator) {
-                await api.post(`/dukcapil/operator/submissions/${id}/assign`);
-            } else {
-                await api.post(`/verifications/${id}/lock`);
-            }
+            // Both operator and verifier use same endpoint now
+            await api.post(`/dukcapil/operator/submissions/${id}/assign`);
             toast.success('Pengajuan dikunci untuk diproses');
             fetchDetail(); // Refresh to see updated status/assignee
         } catch (error) {
@@ -61,9 +65,6 @@ const VerificationDetail = () => {
             setProcessing(false);
         }
     };
-
-    const isOperator = user.role === 'OPERATOR_DUKCAPIL';
-    const isVerifier = user.role === 'VERIFIKATOR_DUKCAPIL';
 
     const handleDecision = async (decision) => {
         // For operators: only "send to verification" (APPROVED) is available
@@ -85,34 +86,38 @@ const VerificationDetail = () => {
         setProcessing(true);
         setShowConfirm(false); // Close modal immediately
         try {
-            if (isOperator && decision === 'APPROVED') {
-                // Operator: Send to verification
+            // Determine current workflow context
+            const isInOperatorWorkflow = status === 'PROCESSING' || status === 'PENDING_VERIFICATION';
+            const isInVerifierWorkflow = status === 'PENDING_VERIFICATION' && isVerifier;
+
+            if (isInOperatorWorkflow && decision === 'APPROVED') {
+                // Operator workflow: Send to verification
                 await api.post(`/dukcapil/operator/submissions/${id}/send-verification`, {
                     notes
                 });
                 toast.success('Pengajuan berhasil dikirim ke verifikator');
                 navigate('/dukcapil/dashboard');
-            } else if (isOperator && decision === 'REJECTED') {
-                // Operator: Return to KUA
+            } else if (isInOperatorWorkflow && decision === 'REJECTED') {
+                // Operator workflow: Return to KUA
                 await api.post(`/dukcapil/operator/submissions/${id}/return`, {
                     reason: notes
                 });
                 toast.success('Pengajuan dikembalikan ke KUA');
                 navigate('/dukcapil/dashboard');
-            } else if (isVerifier && decision === 'APPROVED') {
-                // Verifier: Approve
+            } else if (isInVerifierWorkflow && decision === 'APPROVED') {
+                // Verifier workflow: Final approval
                 await api.post(`/dukcapil/verifier/submissions/${id}/approve`, {
                     notes
                 });
                 toast.success('Pengajuan berhasil DISETUJUI');
-                navigate('/dukcapil/verifier/dashboard');
-            } else if (isVerifier && decision === 'REJECTED') {
-                // Verifier: Reject
+                navigate('/dukcapil/dashboard');
+            } else if (isInVerifierWorkflow && decision === 'REJECTED') {
+                // Verifier workflow: Final rejection
                 await api.post(`/dukcapil/verifier/submissions/${id}/reject`, {
                     notes
                 });
                 toast.success('Pengajuan berhasil DITOLAK');
-                navigate('/dukcapil/verifier/dashboard');
+                navigate('/dukcapil/dashboard');
             }
         } catch (error) {
             const errorMsg = error.userMessage || 'Gagal memproses: ' + error.response?.data?.message;
