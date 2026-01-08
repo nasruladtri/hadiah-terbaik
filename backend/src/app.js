@@ -34,18 +34,21 @@ app.use(helmet({
             defaultSrc: ["'self'"],
             scriptSrc: ["'self'"],
             styleSrc: ["'self'", "'unsafe-inline'"], // TailwindCSS requires unsafe-inline
-            imgSrc: ["'self'", "data:", "https:"],
+            imgSrc: ["'self'", "data:", "https:", "blob:"], // Allow blob for previews
             connectSrc: ["'self'"],
             fontSrc: ["'self'", "https:", "data:"],
             objectSrc: ["'none'"],
             mediaSrc: ["'self'"],
-            frameSrc: ["'none'"],
+            frameSrc: ["'self'"], // Allow iframes from self
             baseUri: ["'self'"],
             formAction: ["'self'"],
-            frameAncestors: ["'none'"],
+            // Allow frontend to frame this API (for PDF previews)
+            frameAncestors: ["'self'", "https://ht.nasruladitri.space", "http://localhost:2200"],
             upgradeInsecureRequests: [],
         },
     },
+    // Allow images to be loaded by other domains (frontend)
+    crossOriginResourcePolicy: { policy: "cross-origin" },
     crossOriginEmbedderPolicy: false,
     hsts: {
         maxAge: 31536000, // 1 year
