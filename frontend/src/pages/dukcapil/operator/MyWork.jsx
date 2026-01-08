@@ -33,6 +33,31 @@ const MyWork = () => {
         fetchMyWork();
     }, []);
 
+    const getWorkType = (status) => {
+        // Differentiate between processing work and verification work
+        if (status === 'PROCESSING') {
+            return {
+                label: 'Pemrosesan',
+                description: 'Sedang Diproses',
+                icon: '⚙️',
+                badgeClass: 'bg-blue-50 text-blue-700'
+            };
+        } else if (status === 'PENDING_VERIFICATION') {
+            return {
+                label: 'Verifikasi',
+                description: 'Menunggu Verifikasi',
+                icon: '🔍',
+                badgeClass: 'bg-yellow-50 text-yellow-700'
+            };
+        }
+        return {
+            label: 'Unknown',
+            description: status,
+            icon: '❓',
+            badgeClass: 'bg-gray-50 text-gray-700'
+        };
+    };
+
     return (
         <div className="space-y-6">
             <div>
@@ -46,6 +71,7 @@ const MyWork = () => {
                         <TableRow>
                             <TableHead>No. Tiket</TableHead>
                             <TableHead>Nama Pasangan</TableHead>
+                            <TableHead>Jenis Pekerjaan</TableHead>
                             <TableHead>Waktu Update</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead className="text-right">Aksi</TableHead>
@@ -54,47 +80,53 @@ const MyWork = () => {
                     <TableBody>
                         {loading ? (
                             <TableRow>
-                                <TableCell colSpan={5} className="text-center py-8">Memuat data...</TableCell>
+                                <TableCell colSpan={6} className="text-center py-8">Memuat data...</TableCell>
                             </TableRow>
                         ) : myQueue.length === 0 ? (
-                            <TableEmpty colSpan={5} message="Anda tidak memiliki pekerjaan aktif." />
+                            <TableEmpty colSpan={6} message="Anda tidak memiliki pekerjaan aktif." />
                         ) : (
-                            myQueue.map((item) => (
-                                <TableRow key={item.id}>
-                                    <TableCell>
-                                        <span className="font-mono font-medium text-emerald-600">#{item.ticket_number}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="font-medium text-slate-900">
-                                            {item.data_pernikahan?.husband_name} & {item.data_pernikahan?.wife_name}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="text-slate-500 text-sm">
-                                            {new Date(item.updated_at).toLocaleString('id-ID')}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell>
-                                        {item.status === 'PROCESSING' ? (
-                                            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700">
-                                                Sedang Diproses
+                            myQueue.map((item) => {
+                                const workType = getWorkType(item.status);
+                                return (
+                                    <TableRow key={item.id}>
+                                        <TableCell>
+                                            <span className="font-mono font-medium text-emerald-600">#{item.ticket_number}</span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="font-medium text-slate-900">
+                                                {item.data_pernikahan?.husband_name} & {item.data_pernikahan?.wife_name}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-lg">{workType.icon}</span>
+                                                <div>
+                                                    <div className="font-semibold text-sm text-slate-900">{workType.label}</div>
+                                                    <div className="text-xs text-slate-500">{workType.description}</div>
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className="text-slate-500 text-sm">
+                                                {new Date(item.updated_at).toLocaleString('id-ID')}
                                             </span>
-                                        ) : (
-                                            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-yellow-50 text-yellow-700">
-                                                Menunggu Verifikasi
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${workType.badgeClass}`}>
+                                                {workType.description}
                                             </span>
-                                        )}
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <Button
-                                            variant={item.status === 'PROCESSING' ? 'primary' : 'outline'}
-                                            onClick={() => navigate(`/dukcapil/process/${item.id}`)}
-                                        >
-                                            {item.status === 'PROCESSING' ? 'Lanjutkan' : 'Lihat'}
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <Button
+                                                variant={item.status === 'PROCESSING' ? 'primary' : 'outline'}
+                                                onClick={() => navigate(`/dukcapil/process/${item.id}`)}
+                                            >
+                                                {item.status === 'PROCESSING' ? 'Lanjutkan' : 'Lihat'}
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })
                         )}
                     </TableBody>
                 </Table>
