@@ -314,41 +314,72 @@ const VerificationDetail = () => {
                         </CardHeader>
                         <CardContent className="p-0">
                             <ul className="divide-y divide-slate-100">
-                                {dokumen?.map((doc) => (
-                                    <li key={doc.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
-                                        <div className="flex items-start gap-3">
-                                            <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                                                <FileText className="w-6 h-6" />
+                                {dokumen?.map((doc) => {
+                                    const token = sessionStorage.getItem('token');
+                                    const previewUrl = `${API_BASE_URL}/submissions/document/${doc.file_path}?token=${token}&inline=true`;
+                                    const isImage = doc.file_name?.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp)$/);
+                                    const isPDF = doc.file_name?.toLowerCase().endsWith('.pdf');
+
+                                    return (
+                                        <li key={doc.id} className="p-4 hover:bg-slate-50 transition-colors">
+                                            <div className="flex flex-col gap-4">
+                                                {/* Document Info & Actions Row */}
+                                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                                    <div className="flex items-start gap-3">
+                                                        <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                                                            <FileText className="w-6 h-6" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm font-medium text-slate-900">{doc.doc_type.replace(/_/g, ' ')}</p>
+                                                            <p className="text-xs text-slate-500 mt-0.5">{doc.file_name} • {(doc.file_size / 1024).toFixed(1)} KB</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => window.open(previewUrl, '_blank')}
+                                                        >
+                                                            <Eye className="w-3.5 h-3.5 mr-1.5" />
+                                                            Buka Tab Baru
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => handleDownload(doc.file_path, doc.file_name)}
+                                                        >
+                                                            <Download className="w-3.5 h-3.5 mr-1.5" />
+                                                            Unduh
+                                                        </Button>
+                                                    </div>
+                                                </div>
+
+                                                {/* Inline Preview */}
+                                                <div className="rounded-lg border border-slate-200 overflow-hidden bg-slate-50">
+                                                    {isImage ? (
+                                                        <img
+                                                            src={previewUrl}
+                                                            alt={doc.file_name}
+                                                            className="w-full h-auto max-h-96 object-contain bg-white"
+                                                            loading="lazy"
+                                                        />
+                                                    ) : isPDF ? (
+                                                        <iframe
+                                                            src={previewUrl}
+                                                            className="w-full h-96 border-0"
+                                                            title={doc.file_name}
+                                                        />
+                                                    ) : (
+                                                        <div className="p-8 text-center text-slate-500">
+                                                            <FileText className="w-12 h-12 mx-auto mb-2 text-slate-400" />
+                                                            <p className="text-sm">Preview tidak tersedia untuk tipe file ini</p>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="text-sm font-medium text-slate-900">{doc.doc_type.replace(/_/g, ' ')}</p>
-                                                <p className="text-xs text-slate-500 mt-0.5">{doc.file_name} • {(doc.file_size / 1024).toFixed(1)} KB</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => {
-                                                    const token = sessionStorage.getItem('token');
-                                                    const url = `${API_BASE_URL}/submissions/document/${doc.file_path}?token=${token}&inline=true`;
-                                                    window.open(url, '_blank');
-                                                }}
-                                            >
-                                                <Eye className="w-3.5 h-3.5 mr-1.5" />
-                                                Lihat
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => handleDownload(doc.file_path, doc.file_name)}
-                                            >
-                                                <Download className="w-3.5 h-3.5 mr-1.5" />
-                                                Unduh
-                                            </Button>
-                                        </div>
-                                    </li>
-                                ))}
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         </CardContent>
                     </Card>
