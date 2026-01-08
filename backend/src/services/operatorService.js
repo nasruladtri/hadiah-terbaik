@@ -74,7 +74,7 @@ const getQueue = async (status = 'SUBMITTED', page = 1, assigneeId = null) => {
                         uploaded_at: true
                     }
                 },
-                status_logs: {
+                logs: {
                     orderBy: {
                         created_at: 'desc'
                     },

@@ -88,8 +88,8 @@ const History = () => {
     };
 
     const getWorkType = (item, currentUserId) => {
-        // Check status_logs to find what action THIS verifier performed
-        if (!item.status_logs || item.status_logs.length === 0) {
+        // Check logs to find what action THIS verifier performed
+        if (!item.logs || item.logs.length === 0) {
             // Fallback to status-based logic
             if (item.status === 'PENDING_VERIFICATION') {
                 return {
@@ -109,7 +109,7 @@ const History = () => {
         }
 
         // Find the last action performed by current user
-        const userAction = item.status_logs.find(log => log.actor_id === currentUserId);
+        const userAction = item.logs.find(log => log.actor_id === currentUserId);
 
         if (!userAction) {
             // User didn't perform any action on this submission (shouldn't happen)
