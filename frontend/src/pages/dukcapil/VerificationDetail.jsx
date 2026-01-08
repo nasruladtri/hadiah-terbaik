@@ -351,14 +351,19 @@ const VerificationDetail = () => {
 
                 {/* Right Column: Actions */}
                 <div className="lg:col-span-1 space-y-6">
-                    {((isOperator && status === 'PROCESSING') || (isVerifier && status === 'PENDING_VERIFICATION')) ? (
+                    {/* Action buttons for processing submissions */}
+                    {/* Operators can process PROCESSING status */}
+                    {/* Verifiers can process both PROCESSING (operator function) and PENDING_VERIFICATION (verifier function) */}
+                    {(status === 'PROCESSING' || (isVerifier && status === 'PENDING_VERIFICATION')) ? (
                         <Card className="sticky top-6 border-l-4 border-l-primary-500 shadow-md">
                             <CardHeader>
                                 <CardTitle className="text-lg">
-                                    {isOperator ? 'Keputusan Operator' : 'Keputusan Verifikasi'}
+                                    {status === 'PROCESSING' ? 'Keputusan Operator' : 'Keputusan Verifikasi'}
                                 </CardTitle>
                                 <CardDescription>
-                                    {isOperator ? 'Tinjau dan kirim ke verifikator atau kembalikan ke KUA.' : 'Tinjau dan berikan keputusan.'}
+                                    {status === 'PROCESSING'
+                                        ? 'Tinjau dan kirim ke verifikator atau kembalikan ke KUA.'
+                                        : 'Tinjau dan berikan keputusan final.'}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
@@ -368,7 +373,9 @@ const VerificationDetail = () => {
                                         id="notes"
                                         rows={4}
                                         className="w-full text-sm border-slate-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 shadow-sm"
-                                        placeholder={isOperator ? "Masukkan catatan untuk verifikator atau alasan pengembalian..." : "Masukkan komentar persetujuan atau alasan penolakan..."}
+                                        placeholder={status === 'PROCESSING'
+                                            ? "Masukkan catatan untuk verifikator atau alasan pengembalian..."
+                                            : "Masukkan komentar persetujuan atau alasan penolakan..."}
                                         value={notes}
                                         onChange={(e) => setNotes(e.target.value)}
                                     />
@@ -381,7 +388,7 @@ const VerificationDetail = () => {
                                         icon={XCircle}
                                         className="w-full justify-center"
                                     >
-                                        {isOperator ? 'Kembalikan' : 'Tolak'}
+                                        {status === 'PROCESSING' ? 'Kembalikan' : 'Tolak'}
                                     </Button>
                                     <Button
                                         variant="success"
@@ -390,7 +397,7 @@ const VerificationDetail = () => {
                                         icon={CheckCircle}
                                         className="w-full justify-center"
                                     >
-                                        {isOperator ? 'Kirim ke Verifikator' : 'Setujui'}
+                                        {status === 'PROCESSING' ? 'Kirim ke Verifikator' : 'Setujui'}
                                     </Button>
                                 </div>
                             </CardContent>
