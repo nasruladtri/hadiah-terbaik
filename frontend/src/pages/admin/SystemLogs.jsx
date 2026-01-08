@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import api, { ENDPOINTS } from '../../services/api';
+import api, { ENDPOINTS, API_BASE_URL } from '../../services/api';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
