@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Ca
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Alert from '../../components/ui/Alert';
-import { ChevronLeft, FileText, Calendar, MapPin, User, Download } from 'lucide-react';
+import { ChevronLeft, FileText, Calendar, MapPin, User, Download, Eye } from 'lucide-react';
 import Loading from '../../components/common/Loading';
 
 const SubmissionDetail = () => {
@@ -218,26 +218,70 @@ const SubmissionDetail = () => {
                         </CardHeader>
                         <CardContent className="p-0">
                             <ul className="divide-y divide-slate-100">
-                                {dokumen?.map((doc) => (
-                                    <li key={doc.id} className="p-4 hover:bg-slate-50 transition flex items-start gap-3 group">
-                                        <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0 text-green-600">
-                                            <FileText className="w-5 h-5" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-medium text-slate-900 truncate" title={doc.doc_type}>
-                                                {doc.doc_type.replace(/_/g, ' ')}
-                                            </p>
-                                            <p className="text-xs text-slate-500 truncate">{doc.file_name}</p>
-                                            <button
-                                                onClick={() => handleDownload(doc.file_path)}
-                                                className="mt-2 text-xs font-medium text-primary-600 hover:text-primary-700 flex items-center bg-white border border-primary-200 px-2 py-1 rounded shadow-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
-                                            >
-                                                <Download className="w-3 h-3 mr-1" />
-                                                Unduh
-                                            </button>
-                                        </div>
-                                    </li>
-                                ))}
+                                {dokumen?.map((doc) => {
+                                    const token = sessionStorage.getItem('token');
+                                    const previewUrl = `${API_BASE_URL}/submissions/document/${doc.file_path}?token=${token}&inline=true`;
+                                    const isImage = doc.file_name?.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp)$/);
+                                    const isPDF = doc.file_name?.toLowerCase().endsWith('.pdf');
+
+                                    return (
+                                        <li key={doc.id} className="p-4 hover:bg-slate-50 transition">
+                                            <div className="flex flex-col gap-3">
+                                                {/* Document Header */}
+                                                <div className="flex items-start gap-3">
+                                                    <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0 text-green-600">
+                                                        <FileText className="w-5 h-5" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-medium text-slate-900 truncate" title={doc.doc_type}>
+                                                            {doc.doc_type.replace(/_/g, ' ')}
+                                                        </p>
+                                                        <p className="text-xs text-slate-500 truncate">{doc.file_name}</p>
+                                                        <div className="flex gap-2 mt-2">
+                                                            <button
+                                                                onClick={() => window.open(previewUrl, '_blank')}
+                                                                className="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center bg-white border border-blue-200 px-2 py-1 rounded shadow-sm transition-colors"
+                                                            >
+                                                                <Eye className="w-3 h-3 mr-1" />
+                                                                Buka
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDownload(doc.file_path)}
+                                                                className="text-xs font-medium text-primary-600 hover:text-primary-700 flex items-center bg-white border border-primary-200 px-2 py-1 rounded shadow-sm transition-colors"
+                                                            >
+                                                                <Download className="w-3 h-3 mr-1" />
+                                                                Unduh
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Inline Preview */}
+                                                <div className="rounded-lg border border-slate-200 overflow-hidden bg-slate-50">
+                                                    {isImage ? (
+                                                        <img
+                                                            src={previewUrl}
+                                                            alt={doc.file_name}
+                                                            className="w-full h-auto max-h-64 object-contain bg-white"
+                                                            loading="lazy"
+                                                        />
+                                                    ) : isPDF ? (
+                                                        <iframe
+                                                            src={previewUrl}
+                                                            className="w-full h-64 border-0"
+                                                            title={doc.file_name}
+                                                        />
+                                                    ) : (
+                                                        <div className="p-6 text-center text-slate-500">
+                                                            <FileText className="w-10 h-10 mx-auto mb-2 text-slate-400" />
+                                                            <p className="text-xs">Preview tidak tersedia</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </li>
+                                    );
+                                })}
                                 {(!dokumen || dokumen.length === 0) && (
                                     <li className="p-6 text-center text-slate-500 text-sm italic">
                                         Tidak ada dokumen terlampir
