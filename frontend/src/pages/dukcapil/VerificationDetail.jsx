@@ -86,25 +86,14 @@ const VerificationDetail = () => {
         setProcessing(true);
         setShowConfirm(false); // Close modal immediately
         try {
-            // Determine current workflow context
-            const isInOperatorWorkflow = status === 'PROCESSING' || status === 'PENDING_VERIFICATION';
-            const isInVerifierWorkflow = status === 'PENDING_VERIFICATION' && isVerifier;
+            // CRITICAL FIX: Check verifier workflow FIRST before operator workflow
+            // Because PENDING_VERIFICATION can be processed by both, but verifier has priority
 
-            if (isInOperatorWorkflow && decision === 'APPROVED') {
-                // Operator workflow: Send to verification
-                await api.post(`/dukcapil/operator/submissions/${id}/send-verification`, {
-                    notes
-                });
-                toast.success('Pengajuan berhasil dikirim ke verifikator');
-                navigate('/dukcapil/dashboard');
-            } else if (isInOperatorWorkflow && decision === 'REJECTED') {
-                // Operator workflow: Return to KUA
-                await api.post(`/dukcapil/operator/submissions/${id}/return`, {
-                    reason: notes
-                });
-                toast.success('Pengajuan dikembalikan ke KUA');
-                navigate('/dukcapil/dashboard');
-            } else if (isInVerifierWorkflow && decision === 'APPROVED') {
+            const isInVerifierWorkflow = status === 'PENDING_VERIFICATION' && isVerifier;
+            const isInOperatorWorkflow = status === 'PROCESSING';
+
+            // Verifier workflow (MUST be checked FIRST)
+            if (isInVerifierWorkflow && decision === 'APPROVED') {
                 // Verifier workflow: Final approval
                 await api.post(`/dukcapil/verifier/submissions/${id}/approve`, {
                     notes
@@ -117,6 +106,22 @@ const VerificationDetail = () => {
                     notes
                 });
                 toast.success('Pengajuan berhasil DITOLAK');
+                navigate('/dukcapil/dashboard');
+            }
+            // Operator workflow (checked SECOND)
+            else if (isInOperatorWorkflow && decision === 'APPROVED') {
+                // Operator workflow: Send to verification
+                await api.post(`/dukcapil/operator/submissions/${id}/send-verification`, {
+                    notes
+                });
+                toast.success('Pengajuan berhasil dikirim ke verifikator');
+                navigate('/dukcapil/dashboard');
+            } else if (isInOperatorWorkflow && decision === 'REJECTED') {
+                // Operator workflow: Return to KUA
+                await api.post(`/dukcapil/operator/submissions/${id}/return`, {
+                    reason: notes
+                });
+                toast.success('Pengajuan dikembalikan ke KUA');
                 navigate('/dukcapil/dashboard');
             }
         } catch (error) {
