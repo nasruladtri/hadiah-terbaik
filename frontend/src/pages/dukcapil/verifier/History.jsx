@@ -24,7 +24,8 @@ const VerifierHistory = () => {
     const fetchHistory = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await api.get('/dukcapil/verifier/queue?status=APPROVED,REJECTED');
+            // Include PENDING_VERIFICATION for submissions processed by verifier (operator function)
+            const res = await api.get('/dukcapil/verifier/queue?status=PENDING_VERIFICATION,APPROVED,REJECTED');
             // Backend returns { data: { data: [], pagination: {} } }
             const responseData = res.data.data;
             const items = responseData?.data || [];
@@ -70,14 +71,24 @@ const VerifierHistory = () => {
         switch (status) {
             case 'APPROVED': return 'success';
             case 'REJECTED': return 'danger';
+            case 'PENDING_VERIFICATION': return 'warning';
             default: return 'default';
+        }
+    };
+
+    const getStatusLabel = (status) => {
+        switch (status) {
+            case 'APPROVED': return 'Disetujui';
+            case 'REJECTED': return 'Ditolak';
+            case 'PENDING_VERIFICATION': return 'Menunggu Verifikasi';
+            default: return status;
         }
     };
 
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-slate-900">Riwayat Verifikasi</h1>
+                <h1 className="text-2xl font-bold text-slate-900">Riwayat Pengajuan</h1>
                 <p className="text-slate-500 mt-1">Daftar pengajuan yang telah selesai diproses.</p>
             </div>
 
@@ -96,6 +107,7 @@ const VerifierHistory = () => {
                         <Select
                             options={[
                                 { value: '', label: 'Semua Status' },
+                                { value: 'PENDING_VERIFICATION', label: 'Menunggu Verifikasi' },
                                 { value: 'APPROVED', label: 'Disetujui' },
                                 { value: 'REJECTED', label: 'Ditolak' }
                             ]}
@@ -113,7 +125,7 @@ const VerifierHistory = () => {
                         <TableRow>
                             <TableHead>No. Tiket</TableHead>
                             <TableHead>Nama Pasangan</TableHead>
-                            <TableHead>Tanggal Verifikasi</TableHead>
+                            <TableHead>Waktu Selesai</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead className="text-right">Aksi</TableHead>
                         </TableRow>
@@ -143,7 +155,7 @@ const VerifierHistory = () => {
                                     </TableCell>
                                     <TableCell>
                                         <Badge variant={getStatusVariant(item.status)}>
-                                            {item.status === 'APPROVED' ? 'Disetujui' : 'Ditolak'}
+                                            {getStatusLabel(item.status)}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-right">
