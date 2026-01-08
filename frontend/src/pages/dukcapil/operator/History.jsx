@@ -10,9 +10,11 @@ import Pagination from '../../../components/ui/Pagination';
 import { Card, CardContent } from '../../../components/ui/Card';
 import { Search } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const History = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [history, setHistory] = useState([]);
     const [filteredHistory, setFilteredHistory] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -85,23 +87,74 @@ const History = () => {
         }
     };
 
-    const getWorkType = (status) => {
-        // Differentiate between processing work and verification work
-        if (status === 'PENDING_VERIFICATION') {
+    const getWorkType = (item, currentUserId) => {
+        // Check status_logs to find what action THIS verifier performed
+        if (!item.status_logs || item.status_logs.length === 0) {
+            // Fallback to status-based logic
+            if (item.status === 'PENDING_VERIFICATION') {
+                return {
+                    label: 'Pemrosesan',
+                    description: 'Dikirim ke Verifikasi',
+                    variant: 'info',
+                    icon: '📤'
+                };
+            } else {
+                return {
+                    label: 'Verifikasi',
+                    description: item.status === 'APPROVED' ? 'Disetujui' : 'Ditolak',
+                    variant: item.status === 'APPROVED' ? 'success' : 'danger',
+                    icon: item.status === 'APPROVED' ? '✅' : '❌'
+                };
+            }
+        }
+
+        // Find the last action performed by current user
+        const userAction = item.status_logs.find(log => log.actor_id === currentUserId);
+
+        if (!userAction) {
+            // User didn't perform any action on this submission (shouldn't happen)
+            return {
+                label: 'N/A',
+                description: '-',
+                variant: 'default',
+                icon: '❓'
+            };
+        }
+
+        // Check what action user performed based on new_status
+        if (userAction.new_status === 'PENDING_VERIFICATION') {
+            // Verifier did operator work: process → send to verification
             return {
                 label: 'Pemrosesan',
                 description: 'Dikirim ke Verifikasi',
                 variant: 'info',
                 icon: '📤'
             };
-        } else {
+        } else if (userAction.new_status === 'APPROVED') {
+            // Verifier approved
             return {
                 label: 'Verifikasi',
-                description: status === 'APPROVED' ? 'Disetujui' : 'Ditolak',
-                variant: status === 'APPROVED' ? 'success' : 'danger',
-                icon: status === 'APPROVED' ? '✅' : '❌'
+                description: 'Disetujui',
+                variant: 'success',
+                icon: '✅'
+            };
+        } else if (userAction.new_status === 'REJECTED') {
+            // Verifier rejected
+            return {
+                label: 'Verifikasi',
+                description: 'Ditolak',
+                variant: 'danger',
+                icon: '❌'
             };
         }
+
+        // Fallback
+        return {
+            label: 'Unknown',
+            description: userAction.new_status,
+            variant: 'default',
+            icon: '❓'
+        };
     };
 
     return (
@@ -163,7 +216,7 @@ const History = () => {
                             </TableRow>
                         ) : (
                             currentItems.map((item) => {
-                                const workType = getWorkType(item.status);
+                                const workType = getWorkType(item, user?.id);
                                 return (
                                     <TableRow key={item.id} className="hover:bg-slate-50/50">
                                         <TableCell>
