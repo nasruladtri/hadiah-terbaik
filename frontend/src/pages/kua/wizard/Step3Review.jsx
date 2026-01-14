@@ -180,33 +180,57 @@ const Step3Review = ({ formData, files, onPrev, onSaveDraft, onSubmit, loading }
                 </div>
             </div>
 
-            {/* Confirmation Modal */}
+            {/* Confirmation & Alert Modal */}
             <Modal
                 isOpen={showConfirm}
                 onClose={() => setShowConfirm(false)}
-                title={actionType === 'draft' ? "Simpan Draft?" : "Konfirmasi Pengajuan"}
+                title={
+                    actionType === 'draft'
+                        ? "Simpan Draft?"
+                        : (dateWarning ? "Gagal: Aturan H-1" : "Konfirmasi Pengajuan")
+                }
             >
                 <div className="flex flex-col items-center text-center p-4">
-                    <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4 text-yellow-600">
+                    <div className={`w-16 h-16 ${dateWarning && actionType === 'submit' ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-600'} rounded-full flex items-center justify-center mb-4`}>
                         <AlertTriangle className="w-8 h-8" />
                     </div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-2">
-                        {actionType === 'draft' ? "Simpan sebagai draft?" : "Kirim data pengajuan nikah?"}
+                    <h3 className={`text-lg font-bold ${dateWarning && actionType === 'submit' ? 'text-red-900' : 'text-slate-900'} mb-2`}>
+                        {actionType === 'draft'
+                            ? "Simpan sebagai draft?"
+                            : (dateWarning ? "Pengajuan Tidak Bisa Dikirim" : "Kirim data pengajuan nikah?")
+                        }
                     </h3>
-                    <p className="text-slate-500 mb-6">
+                    <div className="text-slate-500 mb-6">
                         {actionType === 'draft'
                             ? "Data Anda akan disimpan dan dapat dilanjutkan nanti. Dokumen yang sudah diupload akan tersimpan."
-                            : <span>Pastikan data untuk <strong>{formData.husband_name}</strong> & <strong>{formData.wife_name}</strong> sudah benar. Data yang dikirim akan diproses oleh Dukcapil.</span>
+                            : dateWarning
+                                ? (
+                                    <div className="space-y-2">
+                                        <p className="text-red-600 font-semibold">Gagal Mengirim!</p>
+                                        <p>Sesuai aturan, pengajuan harus dikirim minimal 1 hari sebelum tanggal akad nikah (H-1).</p>
+                                        <p className="bg-red-50 p-2 rounded text-xs border border-red-100">
+                                            Tanggal nikah ({formData.marriage_date}) terlalu dekat. Silakan ubah tanggal nikah atau simpan sebagai draft saja.
+                                        </p>
+                                    </div>
+                                )
+                                : <span>Pastikan data untuk <strong>{formData.husband_name}</strong> & <strong>{formData.wife_name}</strong> sudah benar. Data yang dikirim akan diproses oleh Dukcapil.</span>
                         }
-                    </p>
+                    </div>
 
                     <div className="flex gap-3 w-full justify-center">
                         <Button variant="outline" onClick={() => setShowConfirm(false)} className="w-full sm:w-auto">
                             Batal
                         </Button>
-                        <Button onClick={handleConfirm} className="w-full sm:w-auto">
-                            {actionType === 'draft' ? "Ya, Simpan Draft" : "Ya, Kirim Sekarang"}
-                        </Button>
+                        {!(dateWarning && actionType === 'submit') && (
+                            <Button onClick={handleConfirm} className="w-full sm:w-auto">
+                                {actionType === 'draft' ? "Ya, Simpan Draft" : "Ya, Kirim Sekarang"}
+                            </Button>
+                        )}
+                        {(dateWarning && actionType === 'submit') && (
+                            <Button variant="secondary" onClick={() => handleAction('draft')} className="w-full sm:w-auto">
+                                Simpan Draft Saja
+                            </Button>
+                        )}
                     </div>
                 </div>
             </Modal>
