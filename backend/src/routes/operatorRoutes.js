@@ -3,7 +3,7 @@ const router = express.Router();
 const operatorController = require('../controllers/operatorController');
 const { verifyToken, authorizeRole } = require('../middlewares/authMiddleware');
 
-/**
+/**     
  * Operator Routes
  * Base path: /api/v1/dukcapil/operator
  * Role: OPERATOR_DUKCAPIL and VERIFIKATOR_DUKCAPIL
