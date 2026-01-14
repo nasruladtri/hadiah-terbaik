@@ -47,9 +47,8 @@ const Sidebar = ({ onCloseMobile }) => {
             case 'VERIFIKATOR_DUKCAPIL':
                 return [
                     { name: 'Dashboard', icon: LayoutDashboard, path: '/dukcapil/dashboard' },
-                    { name: 'Antrian Pengajuan', icon: Files, path: '/dukcapil/queue' },
+                    { name: 'Antrian Masuk', icon: Files, path: '/dukcapil/queue' },
                     { name: 'Pekerjaan Saya', icon: CheckSquare, path: '/dukcapil/my-work' },
-                    { name: 'Antrian Verifikasi', icon: CheckSquare, path: '/dukcapil/verification-queue', badge: true },
                     { name: 'Riwayat', icon: History, path: '/dukcapil/history' },
                     { name: 'Laporan', icon: BarChart3, path: '/dukcapil/laporan' },
                     { name: 'Akun', icon: User, path: '/dukcapil/akun' },

@@ -83,11 +83,11 @@ const OperatorDashboard = () => {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatCard
-                    title={user.role === 'OPERATOR_DUKCAPIL' ? "Antrian Menunggu" : "Menunggu Verifikasi"}
+                    title="Antrian Masuk"
                     value={stats.submitted}
                     icon={Users}
                     color="blue"
-                    onClick={() => navigate(user.role === 'OPERATOR_DUKCAPIL' ? '/dukcapil/queue' : '/dukcapil/verification-queue')}
+                    onClick={() => navigate('/dukcapil/queue')}
                 />
                 <StatCard
                     title="Sedang Diproses"
@@ -187,7 +187,7 @@ const OperatorDashboard = () => {
                             <Users className="w-5 h-5 text-blue-500" />
                             Antrian Masuk
                         </CardTitle>
-                        <Button variant="ghost" size="sm" onClick={() => navigate(user.role === 'OPERATOR_DUKCAPIL' ? '/dukcapil/queue' : '/dukcapil/verification-queue')} className="text-xs text-primary-600">Lihat Semua</Button>
+                        <Button variant="ghost" size="sm" onClick={() => navigate('/dukcapil/queue')} className="text-xs text-primary-600">Lihat Semua</Button>
                     </CardHeader>
                     <CardContent className="pt-4 px-0">
                         <Table>

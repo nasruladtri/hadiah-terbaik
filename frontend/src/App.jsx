@@ -28,10 +28,8 @@ const OperatorQueue = lazy(() => import('./pages/dukcapil/operator/Queue'));
 const OperatorMyWork = lazy(() => import('./pages/dukcapil/operator/MyWork'));
 const OperatorHistory = lazy(() => import('./pages/dukcapil/operator/History'));
 
-// Verifier Dukcapil Pages
-const VerifierDashboard = lazy(() => import('./pages/dukcapil/verifier/Dashboard'));
-const VerifierQueue = lazy(() => import('./pages/dukcapil/verifier/Queue'));
-const VerifierHistory = lazy(() => import('./pages/dukcapil/verifier/History'));
+// Verifier Dukcapil Pages - Moved to Shared/Operator
+// (Verifier components removed in favor of unified operator components)
 
 // Kemenag Pages
 const KemenagDashboard = lazy(() => import('./pages/kemenag/Dashboard'));
@@ -191,14 +189,10 @@ function App() {
                                     }
                                 />
 
-                                {/* Verification Queue - Verifier only */}
+                                {/* Verification Queue - Unified */}
                                 <Route
                                     path="verification-queue"
-                                    element={
-                                        <ProtectedRoute roles={['OPERATOR_DUKCAPIL', 'VERIFIKATOR_DUKCAPIL']}>
-                                            <VerifierQueue />
-                                        </ProtectedRoute>
-                                    }
+                                    element={<Navigate to="/dukcapil/queue" replace />}
                                 />
                                 <Route
                                     path="verify/:id"
