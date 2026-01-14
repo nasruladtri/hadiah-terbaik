@@ -44,6 +44,13 @@ const VerificationDetail = () => {
         fetchDetail();
     }, [fetchDetail]);
 
+    useEffect(() => {
+        if (submission && submission.status === 'PENDING_VERIFICATION' && user.role === 'OPERATOR_DUKCAPIL') {
+            toast.error('Kamu tidak mempunyai akses untuk melakukan pekerjaan verifikator');
+            navigate('/dukcapil/dashboard');
+        }
+    }, [submission, user?.role, navigate]);
+
     // Define role checks FIRST before using them
     const isOperator = user.role === 'OPERATOR_DUKCAPIL';
     const isVerifier = user.role === 'VERIFIKATOR_DUKCAPIL';

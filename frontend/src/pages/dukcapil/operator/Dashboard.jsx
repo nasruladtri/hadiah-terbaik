@@ -9,6 +9,7 @@ import Button from '../../../components/ui/Button';
 import Badge from '../../../components/ui/Badge';
 import Loading from '../../../components/common/Loading';
 import { Users, RefreshCcw, Send, Clock, Wrench } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const OperatorDashboard = () => {
     const { user } = useAuth();
@@ -21,6 +22,18 @@ const OperatorDashboard = () => {
     const [myQueue, setMyQueue] = useState([]);
     const [incomingQueue, setIncomingQueue] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const handleTaskAction = (item) => {
+        if (item.status === 'PENDING_VERIFICATION') {
+            if (user?.role === 'VERIFIKATOR_DUKCAPIL') {
+                navigate(`/dukcapil/verify/${item.id}`);
+            } else {
+                toast.error('Kamu tidak mempunyai akses untuk melakukan pekerjaan verifikator');
+            }
+        } else {
+            navigate(`/dukcapil/process/${item.id}`);
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -125,7 +138,7 @@ const OperatorDashboard = () => {
                                 <TableRow>
                                     <TableHead className="pl-6">Tiket</TableHead>
                                     <TableHead>Pasangan</TableHead>
-                                    <TableHead>Jenis</TableHead>
+                                    <TableHead>Jenis Antrian</TableHead>
                                     <TableHead className="text-right pr-6">Aksi</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -146,15 +159,15 @@ const OperatorDashboard = () => {
                                             </TableCell>
                                             <TableCell>
                                                 {item.status === 'PENDING_VERIFICATION' ? (
-                                                    <Badge variant="default" className="text-[10px] bg-indigo-50 text-indigo-700 border-indigo-100">Antrian Verifikasi</Badge>
+                                                    <Badge variant="default" className="text-[10px] bg-indigo-50 text-indigo-700 border-indigo-100">Verifikasi</Badge>
                                                 ) : (
-                                                    <Badge variant="default" className="text-[10px] bg-amber-50 text-amber-700 border-amber-100">Antrian Pengajuan</Badge>
+                                                    <Badge variant="default" className="text-[10px] bg-amber-50 text-amber-700 border-amber-100">Pengajuan</Badge>
                                                 )}
                                             </TableCell>
                                             <TableCell className="text-right pr-6">
                                                 <Button
                                                     size="sm"
-                                                    onClick={() => navigate(item.status === 'PENDING_VERIFICATION' && user.role === 'VERIFIKATOR_DUKCAPIL' ? `/dukcapil/verify/${item.id}` : `/dukcapil/process/${item.id}`)}
+                                                    onClick={() => handleTaskAction(item)}
                                                 >
                                                     Lanjut
                                                 </Button>
@@ -182,7 +195,7 @@ const OperatorDashboard = () => {
                                 <TableRow>
                                     <TableHead className="pl-6">Tiket</TableHead>
                                     <TableHead>Pasangan</TableHead>
-                                    <TableHead>Jenis</TableHead>
+                                    <TableHead>Jenis Antrian</TableHead>
                                     <TableHead className="text-right pr-6">Aksi</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -203,16 +216,16 @@ const OperatorDashboard = () => {
                                             </TableCell>
                                             <TableCell>
                                                 {item.status === 'PENDING_VERIFICATION' ? (
-                                                    <Badge variant="default" className="text-[10px] bg-indigo-50 text-indigo-700 border-indigo-100">Antrian Verifikasi</Badge>
+                                                    <Badge variant="default" className="text-[10px] bg-indigo-50 text-indigo-700 border-indigo-100">Verifikasi</Badge>
                                                 ) : (
-                                                    <Badge variant="default" className="text-[10px] bg-blue-50 text-blue-700 border-blue-100">Antrian Pengajuan</Badge>
+                                                    <Badge variant="default" className="text-[10px] bg-blue-50 text-blue-700 border-blue-100">Pengajuan</Badge>
                                                 )}
                                             </TableCell>
                                             <TableCell className="text-right pr-6">
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    onClick={() => navigate(item.status === 'PENDING_VERIFICATION' && user.role === 'VERIFIKATOR_DUKCAPIL' ? `/dukcapil/verify/${item.id}` : `/dukcapil/process/${item.id}`)}
+                                                    onClick={() => handleTaskAction(item)}
                                                 >
                                                     Detail
                                                 </Button>

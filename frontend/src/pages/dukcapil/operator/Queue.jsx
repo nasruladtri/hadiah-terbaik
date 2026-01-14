@@ -9,9 +9,11 @@ import Pagination from '../../../components/ui/Pagination';
 import { Card, CardContent } from '../../../components/ui/Card';
 import { Search, Calendar, User, Eye } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useAuth } from '../../../context/AuthContext';
 
 const OperatorQueue = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [queue, setQueue] = useState([]);
     const [filteredQueue, setFilteredQueue] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -63,8 +65,12 @@ const OperatorQueue = () => {
     const currentItems = filteredQueue.slice(indexOfFirstItem, indexOfLastItem);
 
     const handleViewItem = (item) => {
-        if (item.status === 'PENDING_VERIFICATION' && user?.role === 'VERIFIKATOR_DUKCAPIL') {
-            navigate(`/dukcapil/verify/${item.id}`);
+        if (item.status === 'PENDING_VERIFICATION') {
+            if (user?.role === 'VERIFIKATOR_DUKCAPIL') {
+                navigate(`/dukcapil/verify/${item.id}`);
+            } else {
+                toast.error('Kamu tidak mempunyai akses untuk melakukan pekerjaan verifikator');
+            }
         } else {
             navigate(`/dukcapil/process/${item.id}`);
         }
@@ -73,8 +79,8 @@ const OperatorQueue = () => {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-slate-900">Antrian Pengajuan</h1>
-                <p className="text-slate-500 mt-1">Daftar pengajuan baru yang siap diproses.</p>
+                <h1 className="text-2xl font-bold text-slate-900">Antrian Masuk</h1>
+                <p className="text-slate-500 mt-1">Daftar semua pengajuan yang masuk dan siap diproses.</p>
             </div>
 
             {/* Filter */}
@@ -98,7 +104,7 @@ const OperatorQueue = () => {
                         <TableRow>
                             <TableHead>No. Tiket</TableHead>
                             <TableHead>Nama Pasangan</TableHead>
-                            <TableHead>Jenis</TableHead>
+                            <TableHead>Jenis Antrian</TableHead>
                             <TableHead>Pemohon</TableHead>
                             <TableHead>Waktu</TableHead>
                             <TableHead className="text-right">Aksi</TableHead>
@@ -127,11 +133,11 @@ const OperatorQueue = () => {
                                     <TableCell>
                                         {item.status === 'PENDING_VERIFICATION' ? (
                                             <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
-                                                Antrian Verifikasi
+                                                Verifikasi
                                             </span>
                                         ) : (
                                             <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-100">
-                                                Antrian Pengajuan
+                                                Pengajuan
                                             </span>
                                         )}
                                     </TableCell>

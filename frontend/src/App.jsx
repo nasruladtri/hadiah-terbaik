@@ -195,7 +195,7 @@ function App() {
                                 <Route
                                     path="verification-queue"
                                     element={
-                                        <ProtectedRoute roles={['VERIFIKATOR_DUKCAPIL']}>
+                                        <ProtectedRoute roles={['OPERATOR_DUKCAPIL', 'VERIFIKATOR_DUKCAPIL']}>
                                             <VerifierQueue />
                                         </ProtectedRoute>
                                     }
@@ -203,7 +203,7 @@ function App() {
                                 <Route
                                     path="verify/:id"
                                     element={
-                                        <ProtectedRoute roles={['VERIFIKATOR_DUKCAPIL']}>
+                                        <ProtectedRoute roles={['OPERATOR_DUKCAPIL', 'VERIFIKATOR_DUKCAPIL']}>
                                             <VerificationDetail />
                                         </ProtectedRoute>
                                     }

@@ -9,8 +9,11 @@ import { Card, CardContent } from '../../../components/ui/Card';
 import { Search, Calendar, User } from 'lucide-react';
 import { toast } from 'react-toastify';
 
+import { useAuth } from '../../../context/AuthContext';
+
 const VerifierQueue = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [queue, setQueue] = useState([]);
     const [filteredQueue, setFilteredQueue] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -37,8 +40,13 @@ const VerifierQueue = () => {
     }, []);
 
     useEffect(() => {
+        if (user?.role === 'OPERATOR_DUKCAPIL') {
+            toast.error('Kamu tidak mempunyai akses untuk melakukan pekerjaan verifikator');
+            navigate('/dukcapil/dashboard');
+            return;
+        }
         fetchQueue();
-    }, [fetchQueue]);
+    }, [fetchQueue, user?.role, navigate]);
 
     useEffect(() => {
         let filtered = [...queue];

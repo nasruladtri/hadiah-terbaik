@@ -39,14 +39,14 @@ const MyWork = () => {
         // Differentiate between processing work and verification work
         if (status === 'PROCESSING') {
             return {
-                label: 'Antrian Pengajuan',
+                label: 'Pengajuan',
                 description: 'Sedang Diproses',
                 icon: '⚙️',
                 badgeClass: 'bg-blue-50 text-blue-700'
             };
         } else if (status === 'PENDING_VERIFICATION') {
             return {
-                label: 'Antrian Verifikasi',
+                label: 'Verifikasi',
                 description: 'Menunggu Verifikasi',
                 icon: '🔍',
                 badgeClass: 'bg-yellow-50 text-yellow-700'
@@ -73,7 +73,7 @@ const MyWork = () => {
                         <TableRow>
                             <TableHead>No. Tiket</TableHead>
                             <TableHead>Nama Pasangan</TableHead>
-                            <TableHead>Jenis Pekerjaan</TableHead>
+                            <TableHead>Jenis Antrian</TableHead>
                             <TableHead>Waktu Update</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead className="text-right">Aksi</TableHead>
@@ -121,7 +121,17 @@ const MyWork = () => {
                                         <TableCell className="text-right">
                                             <Button
                                                 variant={item.status === 'PROCESSING' ? 'primary' : 'outline'}
-                                                onClick={() => navigate(item.status === 'PENDING_VERIFICATION' && user?.role === 'VERIFIKATOR_DUKCAPIL' ? `/dukcapil/verify/${item.id}` : `/dukcapil/process/${item.id}`)}
+                                                onClick={() => {
+                                                    if (item.status === 'PENDING_VERIFICATION') {
+                                                        if (user?.role === 'VERIFIKATOR_DUKCAPIL') {
+                                                            navigate(`/dukcapil/verify/${item.id}`);
+                                                        } else {
+                                                            toast.error('Kamu tidak mempunyai akses untuk melakukan pekerjaan verifikator');
+                                                        }
+                                                    } else {
+                                                        navigate(`/dukcapil/process/${item.id}`);
+                                                    }
+                                                }}
                                             >
                                                 {item.status === 'PROCESSING' ? 'Lanjutkan' : 'Lihat'}
                                             </Button>

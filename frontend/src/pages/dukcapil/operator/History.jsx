@@ -93,7 +93,7 @@ const History = () => {
             // Fallback to status-based logic
             if (item.status === 'PENDING_VERIFICATION') {
                 return {
-                    label: 'Pemrosesan',
+                    label: 'Pengajuan',
                     description: 'Dikirim ke Verifikasi',
                     variant: 'info',
                     icon: '📤'
@@ -125,7 +125,7 @@ const History = () => {
         if (userAction.new_status === 'PENDING_VERIFICATION') {
             // Verifier did operator work: process → send to verification
             return {
-                label: 'Pemrosesan',
+                label: 'Pengajuan',
                 description: 'Dikirim ke Verifikasi',
                 variant: 'info',
                 icon: '📤'
@@ -197,7 +197,7 @@ const History = () => {
                         <TableRow>
                             <TableHead>No. Tiket</TableHead>
                             <TableHead>Nama Pasangan</TableHead>
-                            <TableHead>Jenis Pekerjaan</TableHead>
+                            <TableHead>Jenis Antrian</TableHead>
                             <TableHead>Waktu Selesai</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead className="text-right">Aksi</TableHead>
