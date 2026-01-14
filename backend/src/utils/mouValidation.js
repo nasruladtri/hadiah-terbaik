@@ -1,12 +1,10 @@
 /**
  * MOU Validation Utilities
- * H-1 Rule and other MOU-specific validations
- * Based on Kemenag-Dukcapil MOU Article 5, Point 2
+ * H-1 Rule and other specific validations
  */
 
 /**
  * Validate H-1 Rule: Marriage date must be at least 1 day from creation
- * MOU Article 5, Point 2
  * 
  * @param {Date|string} marriageDate - Marriage date to validate
  * @param {Date|string} createdAt - Submission creation date (defaults to now)
@@ -28,8 +26,8 @@ function validateH1Rule(marriageDate, createdAt = new Date()) {
 
     if (daysDifference < 1) {
         throw new Error(
-            'VALIDATION_ERROR: Pengajuan harus dibuat minimal 1 hari sebelum tanggal akad nikah (H-1). ' +
-            'Sesuai MOU Pasal 5 Ayat 2.'
+            'Gagal Mengirim: Pengajuan harus dikirim minimal 1 hari sebelum tanggal akad nikah (H-1). ' +
+            'Pengajuan untuk pernikahan hari ini atau masa lalu tidak diperbolehkan melalui sistem ini.'
         );
     }
 

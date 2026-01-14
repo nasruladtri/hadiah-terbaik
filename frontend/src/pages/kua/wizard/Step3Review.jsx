@@ -45,12 +45,42 @@ const Step3Review = ({ formData, files, onPrev, onSaveDraft, onSubmit, loading }
     // Helper to count files
     const fileCount = Object.keys(files).filter(k => files[k]).length;
 
+    // H-1 Validation Check (Proactive UI Warning)
+    const isDateInvalid = () => {
+        if (!formData.marriage_date) return false;
+        const marriageDate = new Date(formData.marriage_date);
+        const today = new Date();
+        marriageDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+
+        // Difference in days
+        const diffDays = Math.floor((marriageDate - today) / (1000 * 60 * 60 * 24));
+        return diffDays < 1;
+    };
+
+    const dateWarning = isDateInvalid();
+
     return (
         <div className="space-y-8">
             <div className="text-center max-w-2xl mx-auto mb-8">
                 <h2 className="text-2xl font-display font-bold text-slate-900">Tinjau Pengajuan</h2>
                 <p className="text-slate-500 mt-2">Pastikan semua data yang Anda masukkan sudah benar sebelum mengirimkan pengajuan.</p>
             </div>
+
+            {dateWarning && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-4 mb-6">
+                    <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 text-red-600">
+                        <AlertTriangle className="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h4 className="font-bold text-red-900">Peringatan: Aturan H-1</h4>
+                        <p className="text-sm text-red-700 leading-relaxed">
+                            Pengajuan harus dikirim minimal 1 hari sebelum tanggal akad nikah (H-1).
+                            Karena tanggal nikah yang dipilih ({formData.marriage_date}), pengajuan ini kemungkinan besar akan <strong>ditolak oleh sistem</strong> saat dikirim.
+                        </p>
+                    </div>
+                </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <ReviewSection title="Data Suami" icon={User}>
