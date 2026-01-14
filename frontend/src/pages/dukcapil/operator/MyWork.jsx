@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../../services/api';
+import { useAuth } from '../../../context/AuthContext';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableEmpty } from '../../../components/ui/Table';
 import Button from '../../../components/ui/Button';
 
@@ -8,6 +9,7 @@ import { Card } from '../../../components/ui/Card';
 import { toast } from 'react-toastify';
 
 const MyWork = () => {
+    const { user } = useAuth();
     const navigate = useNavigate();
     const [myQueue, setMyQueue] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -37,7 +39,7 @@ const MyWork = () => {
         // Differentiate between processing work and verification work
         if (status === 'PROCESSING') {
             return {
-                label: 'Pemrosesan',
+                label: 'Pengolahan',
                 description: 'Sedang Diproses',
                 icon: '⚙️',
                 badgeClass: 'bg-blue-50 text-blue-700'
@@ -119,7 +121,7 @@ const MyWork = () => {
                                         <TableCell className="text-right">
                                             <Button
                                                 variant={item.status === 'PROCESSING' ? 'primary' : 'outline'}
-                                                onClick={() => navigate(`/dukcapil/process/${item.id}`)}
+                                                onClick={() => navigate(item.status === 'PENDING_VERIFICATION' && user?.role === 'VERIFIKATOR_DUKCAPIL' ? `/dukcapil/verify/${item.id}` : `/dukcapil/process/${item.id}`)}
                                             >
                                                 {item.status === 'PROCESSING' ? 'Lanjutkan' : 'Lihat'}
                                             </Button>

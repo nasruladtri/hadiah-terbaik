@@ -35,13 +35,13 @@ const OperatorDashboard = () => {
                 }
 
                 // Fetch "My Work" - submissions that are PROCESSING or PENDING_VERIFICATION and assigned to ME
-                const mineStatus = user.role === 'OPERATOR_DUKCAPIL' ? 'PROCESSING' : 'PENDING_VERIFICATION';
+                const mineStatus = user.role === 'OPERATOR_DUKCAPIL' ? 'PROCESSING' : 'PROCESSING,PENDING_VERIFICATION';
                 const resMyQueue = await api.get(`/dukcapil/operator/queue?status=${mineStatus}&mine=true&limit=5`);
                 const myQueueItems = resMyQueue.data.success ? resMyQueue.data.data?.data || [] : [];
                 setMyQueue(myQueueItems);
 
                 // Fetch "Incoming Queue" - items waiting to be picked up
-                const incomingStatus = user.role === 'OPERATOR_DUKCAPIL' ? 'SUBMITTED' : 'PENDING_VERIFICATION';
+                const incomingStatus = user.role === 'OPERATOR_DUKCAPIL' ? 'SUBMITTED' : 'SUBMITTED,PENDING_VERIFICATION';
                 const resIncoming = await api.get(`/dukcapil/operator/queue?status=${incomingStatus}&mine=false&limit=5`);
                 const incomingItems = resIncoming.data.success ? resIncoming.data.data?.data || [] : [];
                 setIncomingQueue(incomingItems);
@@ -61,7 +61,7 @@ const OperatorDashboard = () => {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header */}
             <div>
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Dashboard Operator</h1>
+                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Dashboard {user?.role === 'OPERATOR_DUKCAPIL' ? 'Operator' : 'Verifikator'}</h1>
                 <p className="mt-1 text-sm text-slate-500">
                     Selamat datang, <span className="font-semibold text-primary-600">{user?.full_name}</span>.
                 </p>
@@ -125,12 +125,13 @@ const OperatorDashboard = () => {
                                 <TableRow>
                                     <TableHead className="pl-6">Tiket</TableHead>
                                     <TableHead>Pasangan</TableHead>
+                                    <TableHead>Jenis</TableHead>
                                     <TableHead className="text-right pr-6">Aksi</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {myQueue.length === 0 ? (
-                                    <TableEmpty colSpan={3} message="Belum ada pekerjaan yang dikunci" />
+                                    <TableEmpty colSpan={4} message="Belum ada pekerjaan yang dikunci" />
                                 ) : (
                                     myQueue.map((item) => (
                                         <TableRow key={item.id}>
@@ -143,10 +144,17 @@ const OperatorDashboard = () => {
                                                 </div>
                                                 <div className="text-[10px] text-slate-400">& {item.data_pernikahan?.wife_name}</div>
                                             </TableCell>
+                                            <TableCell>
+                                                {item.status === 'PENDING_VERIFICATION' ? (
+                                                    <Badge variant="default" className="text-[10px] bg-indigo-50 text-indigo-700 border-indigo-100">Verifikasi</Badge>
+                                                ) : (
+                                                    <Badge variant="default" className="text-[10px] bg-amber-50 text-amber-700 border-amber-100">Pengolahan</Badge>
+                                                )}
+                                            </TableCell>
                                             <TableCell className="text-right pr-6">
                                                 <Button
                                                     size="sm"
-                                                    onClick={() => navigate(`/dukcapil/process/${item.id}`)}
+                                                    onClick={() => navigate(item.status === 'PENDING_VERIFICATION' && user.role === 'VERIFIKATOR_DUKCAPIL' ? `/dukcapil/verify/${item.id}` : `/dukcapil/process/${item.id}`)}
                                                 >
                                                     Lanjut
                                                 </Button>
@@ -174,12 +182,13 @@ const OperatorDashboard = () => {
                                 <TableRow>
                                     <TableHead className="pl-6">Tiket</TableHead>
                                     <TableHead>Pasangan</TableHead>
+                                    <TableHead>Jenis</TableHead>
                                     <TableHead className="text-right pr-6">Aksi</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {incomingQueue.length === 0 ? (
-                                    <TableEmpty colSpan={3} message="Belum ada antrian masuk" />
+                                    <TableEmpty colSpan={4} message="Belum ada antrian masuk" />
                                 ) : (
                                     incomingQueue.map((item) => (
                                         <TableRow key={item.id}>
@@ -192,11 +201,18 @@ const OperatorDashboard = () => {
                                                 </div>
                                                 <div className="text-[10px] text-slate-400">& {item.data_pernikahan?.wife_name}</div>
                                             </TableCell>
+                                            <TableCell>
+                                                {item.status === 'PENDING_VERIFICATION' ? (
+                                                    <Badge variant="default" className="text-[10px] bg-indigo-50 text-indigo-700 border-indigo-100">Verifikasi</Badge>
+                                                ) : (
+                                                    <Badge variant="default" className="text-[10px] bg-blue-50 text-blue-700 border-blue-100">Pengolahan</Badge>
+                                                )}
+                                            </TableCell>
                                             <TableCell className="text-right pr-6">
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    onClick={() => navigate(user.role === 'OPERATOR_DUKCAPIL' ? `/dukcapil/process/${item.id}` : `/dukcapil/verify/${item.id}`)}
+                                                    onClick={() => navigate(item.status === 'PENDING_VERIFICATION' && user.role === 'VERIFIKATOR_DUKCAPIL' ? `/dukcapil/verify/${item.id}` : `/dukcapil/process/${item.id}`)}
                                                 >
                                                     Detail
                                                 </Button>

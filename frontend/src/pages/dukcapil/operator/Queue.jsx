@@ -22,7 +22,8 @@ const OperatorQueue = () => {
     const fetchQueue = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await api.get('/dukcapil/operator/queue?status=SUBMITTED');
+            const status = user?.role === 'OPERATOR_DUKCAPIL' ? 'SUBMITTED' : 'SUBMITTED,PENDING_VERIFICATION';
+            const res = await api.get(`/dukcapil/operator/queue?status=${status}`);
             // Backend returns { data: { data: [], pagination: {} } }
             const responseData = res.data.data;
             const items = responseData?.data || []; // Access the nested data array
@@ -61,8 +62,12 @@ const OperatorQueue = () => {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredQueue.slice(indexOfFirstItem, indexOfLastItem);
 
-    const handleViewItem = (itemId) => {
-        navigate(`/dukcapil/process/${itemId}`);
+    const handleViewItem = (item) => {
+        if (item.status === 'PENDING_VERIFICATION' && user?.role === 'VERIFIKATOR_DUKCAPIL') {
+            navigate(`/dukcapil/verify/${item.id}`);
+        } else {
+            navigate(`/dukcapil/process/${item.id}`);
+        }
     };
 
     return (
@@ -93,6 +98,7 @@ const OperatorQueue = () => {
                         <TableRow>
                             <TableHead>No. Tiket</TableHead>
                             <TableHead>Nama Pasangan</TableHead>
+                            <TableHead>Jenis</TableHead>
                             <TableHead>Pemohon</TableHead>
                             <TableHead>Waktu</TableHead>
                             <TableHead className="text-right">Aksi</TableHead>
@@ -119,6 +125,17 @@ const OperatorQueue = () => {
                                         </div>
                                     </TableCell>
                                     <TableCell>
+                                        {item.status === 'PENDING_VERIFICATION' ? (
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+                                                Verifikasi
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                                Pengolahan
+                                            </span>
+                                        )}
+                                    </TableCell>
+                                    <TableCell>
                                         <div className="flex items-center gap-2 text-slate-600 text-sm">
                                             <User className="w-3 h-3" />
                                             {item.creator?.full_name || 'KUA'}
@@ -131,7 +148,7 @@ const OperatorQueue = () => {
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <Button variant="outline" onClick={() => handleViewItem(item.id)} icon={Eye} className="w-full sm:w-auto">
+                                        <Button variant="outline" onClick={() => handleViewItem(item)} icon={Eye} className="w-full sm:w-auto">
                                             Lihat Detail
                                         </Button>
                                     </TableCell>
