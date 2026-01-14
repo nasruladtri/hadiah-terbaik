@@ -131,11 +131,11 @@ const assignSubmission = async (submissionId, userId, userRole) => {
     let isAllowed = false;
 
     if (submission.status === 'SUBMITTED') {
-        if (userRole === 'OPERATOR_DUKCAPIL') {
+        if (userRole === 'OPERATOR_DUKCAPIL' || userRole === 'VERIFIKATOR_DUKCAPIL') {
             newStatus = 'PROCESSING';
             isAllowed = true;
         } else {
-            throw new AppError('Hanya operator yang dapat mengunci pengajuan baru', 403);
+            throw new AppError('Hanya petugas Dukcapil yang dapat mengunci pengajuan baru', 403);
         }
     } else if (submission.status === 'PENDING_VERIFICATION') {
         if (userRole === 'VERIFIKATOR_DUKCAPIL') {
@@ -387,23 +387,25 @@ const getOperatorReports = async (userId, period = 'month', userRole = 'OPERATOR
     const isOperator = userRole === 'OPERATOR_DUKCAPIL';
 
     // 1. Get Incoming Queue Count (Items waiting for ANY user of this role)
-    const queueQuery = {
-        status: isOperator ? 'SUBMITTED' : 'PENDING_VERIFICATION'
-    };
+    const queueStatuses = isOperator
+        ? ['SUBMITTED']
+        : ['SUBMITTED', 'PENDING_VERIFICATION'];
 
-    // For Verifiers, only count ones that ARE NOT yet locked by someone else 
-    // (Or should we show all PENDING_VERIFICATION as 'Antrian'?)
-    // Let's show all that aren't locked by them specifically, but actually 'Antrian Masuk' 
-    // usually means 'Waiting to be picked up'.
-    queueQuery.current_assignee_id = null;
-
-    const queueCount = await prisma.permohonan.count({ where: queueQuery });
+    const queueCount = await prisma.permohonan.count({
+        where: {
+            status: { in: queueStatuses },
+            current_assignee_id: null
+        }
+    });
 
     // 2. Get Processing Count (Items currently locked by THIS user)
-    const processingStatus = isOperator ? 'PROCESSING' : 'PENDING_VERIFICATION';
+    const processingStatuses = isOperator
+        ? ['PROCESSING']
+        : ['PROCESSING', 'PENDING_VERIFICATION'];
+
     const processingCount = await prisma.permohonan.count({
         where: {
-            status: processingStatus,
+            status: { in: processingStatuses },
             current_assignee_id: userId
         }
     });
@@ -414,7 +416,7 @@ const getOperatorReports = async (userId, period = 'month', userRole = 'OPERATOR
 
     const completedTodayStatuses = isOperator
         ? ['PENDING_VERIFICATION', 'NEEDS_REVISION']
-        : ['APPROVED', 'REJECTED'];
+        : ['APPROVED', 'REJECTED', 'PENDING_VERIFICATION', 'NEEDS_REVISION'];
 
     const completedTodayCount = await prisma.statusLog.count({
         where: {
