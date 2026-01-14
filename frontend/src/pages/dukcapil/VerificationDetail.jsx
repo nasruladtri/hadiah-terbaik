@@ -66,16 +66,7 @@ const VerificationDetail = () => {
         }
     };
 
-    const handleDecision = async (decision) => {
-        // For operators: only "send to verification" (APPROVED) is available
-        // For verifiers: both APPROVED and REJECTED are available
-
-        // Validate notes for rejection (verifier only)
-        if (decision === 'REJECTED' && !notes.trim()) {
-            toast.warn('Catatan wajib diisi untuk penolakan.');
-            return;
-        }
-
+    const handleDecision = (decision) => {
         // Show confirmation dialog
         setConfirmAction(decision);
         setShowConfirm(true);
@@ -474,30 +465,61 @@ const VerificationDetail = () => {
                             variant={confirmAction === 'APPROVED' ? 'success' : 'danger'}
                             onClick={handleConfirmDecision}
                             loading={processing}
+                            disabled={confirmAction === 'REJECTED' && !notes.trim()}
                         >
-                            Konfirmasi {isOperator
+                            {confirmAction === 'REJECTED' && !notes.trim() ? 'Alasan Wajib Diisi' : `Konfirmasi ${isOperator
                                 ? (confirmAction === 'APPROVED' ? 'Pengiriman' : 'Pengembalian')
                                 : (confirmAction === 'APPROVED' ? 'Persetujuan' : 'Penolakan')
-                            }
+                                }`}
                         </Button>
                     </>
                 }
             >
                 <div className="space-y-4">
-                    <p>
-                        Apakah Anda yakin ingin <strong className={confirmAction === 'APPROVED' ? 'text-green-600' : 'text-red-600'}>
-                            {isOperator
-                                ? (confirmAction === 'APPROVED' ? 'MENGIRIM ke VERIFIKATOR' : 'MENGEMBALIKAN ke KUA')
-                                : (confirmAction === 'APPROVED' ? 'MENYETUJUI' : 'MENOLAK')
-                            }
-                        </strong> pengajuan ini?
-                    </p>
-                    {notes && (
-                        <div className="bg-slate-50 p-3 rounded-md border border-slate-200">
-                            <p className="text-xs text-slate-500 uppercase font-semibold mb-1">Catatan Anda:</p>
-                            <p className="text-sm text-slate-700 italic">&quot;{notes}&quot;</p>
+                    {/* Rejection/Return Warning for Empty Notes */}
+                    {confirmAction === 'REJECTED' && !notes.trim() && (
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                            <div className="flex items-start gap-3">
+                                <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5" />
+                                <div>
+                                    <h4 className="text-sm font-bold text-red-900">Alasan Wajib Diisi</h4>
+                                    <p className="text-xs text-red-700 mt-1">
+                                        Anda harus memberikan alasan mengapa pengajuan ini dikembalikan atau ditolak agar pemohon dapat memperbaikinya.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="mt-4">
+                                <textarea
+                                    className="w-full text-sm border-red-300 rounded-lg focus:ring-red-500 focus:border-red-500"
+                                    rows={3}
+                                    placeholder="Tulis alasan di sini..."
+                                    value={notes}
+                                    onChange={(e) => setNotes(e.target.value)}
+                                    autoFocus
+                                />
+                            </div>
                         </div>
                     )}
+
+                    {!(confirmAction === 'REJECTED' && !notes.trim()) && (
+                        <>
+                            <p>
+                                Apakah Anda yakin ingin <strong className={confirmAction === 'APPROVED' ? 'text-green-600' : 'text-red-600'}>
+                                    {isOperator
+                                        ? (confirmAction === 'APPROVED' ? 'MENGIRIM ke VERIFIKATOR' : 'MENGEMBALIKAN ke KUA')
+                                        : (confirmAction === 'APPROVED' ? 'MENYETUJUI' : 'MENOLAK')
+                                    }
+                                </strong> pengajuan ini?
+                            </p>
+                            {notes && (
+                                <div className="bg-slate-50 p-3 rounded-md border border-slate-200">
+                                    <p className="text-xs text-slate-500 uppercase font-semibold mb-1">Catatan Anda:</p>
+                                    <p className="text-sm text-slate-700 italic">&quot;{notes}&quot;</p>
+                                </div>
+                            )}
+                        </>
+                    )}
+
                     {confirmAction === 'APPROVED' && (
                         <Alert variant="warning" className="py-2 text-xs">
                             {isOperator
