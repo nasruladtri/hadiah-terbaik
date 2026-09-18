@@ -15,7 +15,6 @@ const app = express();
 app.set('trust proxy', 1); // Trust Cloudflare/Nginx proxy
 const PORT = process.env.PORT || 3000;
 
-const authRoutes = require('./routes/authRoutes');
 const submissionRoutes = require('./routes/submissionRoutes');
 const verificationRoutes = require('./routes/verificationRoutes');
 const generalRoutes = require('./routes/generalRoutes');
@@ -99,8 +98,18 @@ app.use((req, res, next) => {
 });
 
 // Routes - New role-based structure (UPDATE.MD compliant)
-app.use('/api/v1/auth', authLimiter, authRoutes);
-// app.use('/api/v1/auth', authRoutes); // RATE LIMIT DISABLED FOR DEBUGGING
+// Apply authLimiter only to login endpoint, not to first-login-change-password
+const authController = require('./controllers/authController');
+const { verifyToken } = require('./middlewares/authMiddleware');
+
+const authRouter = express.Router();
+authRouter.post('/login', authLimiter, authController.login);
+authRouter.put('/first-login-change-password', authController.firstLoginChangePassword);
+authRouter.post('/logout', verifyToken, authController.logout);
+authRouter.put('/change-password', verifyToken, authController.changePassword);
+authRouter.get('/me', verifyToken, authController.me);
+
+app.use('/api/v1/auth', authRouter);
 app.use('/api', globalLimiter); // General limit for all APIs
 
 // Role-based routes

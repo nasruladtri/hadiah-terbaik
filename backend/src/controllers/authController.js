@@ -77,9 +77,36 @@ const changePassword = async (req, res) => {
     }
 };
 
+/**
+ * Change password on first login (no token required)
+ * Uses username + old_password for verification
+ */
+const firstLoginChangePassword = async (req, res) => {
+    try {
+        const { username, oldPassword, newPassword } = req.body;
+
+        if (!username || !oldPassword || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'Username, password lama, dan password baru wajib diisi'
+            });
+        }
+
+        // Call service with username instead of userId
+        const result = await authService.firstLoginChangePassword(username, oldPassword, newPassword);
+        res.json(result);
+    } catch (error) {
+        res.status(error.message.includes('tidak sesuai') || error.message.includes('tidak ditemukan') ? 400 : 500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 module.exports = {
     login,
     me,
     logout,
-    changePassword
+    changePassword,
+    firstLoginChangePassword
 };

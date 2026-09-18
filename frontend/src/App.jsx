@@ -8,6 +8,7 @@ import AuthLayout from './layouts/AuthLayout';
 
 // Lazy Load Pages
 const Login = lazy(() => import('./pages/Login'));
+const ChangePassword = lazy(() => import('./pages/ChangePassword'));
 const Akun = lazy(() => import('./pages/shared/Akun'));
 
 // KUA Pages
@@ -66,6 +67,7 @@ function App() {
                         {/* Auth Routes */}
                         <Route path="/auth" element={<AuthLayout />}>
                             <Route path="login" element={<Login />} />
+                            <Route path="change-password" element={<ChangePassword />} />
                             <Route index element={<Navigate to="/auth/login" replace />} />
                         </Route>
 

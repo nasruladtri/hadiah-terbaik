@@ -40,17 +40,58 @@ export const AuthProvider = ({ children }) => {
     const login = async (username, password) => {
         try {
             const response = await api.post('/auth/login', { username, password });
-            const { token, user } = response.data.data;
+            const data = response.data.data;
+
+            // Handle must_change_password response
+            if (data.must_change_password) {
+                return {
+                    success: true,
+                    must_change_password: true,
+                    user_id: data.user_id,
+                    username: data.username,
+                    message: data.message
+                };
+            }
+
+            const { token, user: userData } = data;
 
             sessionStorage.setItem('token', token);
-            sessionStorage.setItem('user', JSON.stringify(user));
-            setUser(user);
+            sessionStorage.setItem('user', JSON.stringify(userData));
+            setUser(userData);
             return { success: true };
         } catch (error) {
             console.error('Login failed', error);
             return {
                 success: false,
                 message: error.response?.data?.message || 'Login failed'
+            };
+        }
+    };
+
+    const changePassword = async (userId, oldPassword, newPassword) => {
+        try {
+            const response = await api.put('/auth/change-password', {
+                oldPassword,
+                newPassword
+            }, {
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                }
+            });
+
+            if (response.data.success) {
+                // Clear token and user after password change (user needs to login again)
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('user');
+                setUser(null);
+                return { success: true, message: response.data.message };
+            }
+            return { success: false, message: response.data.message };
+        } catch (error) {
+            console.error('Change password failed', error);
+            return {
+                success: false,
+                message: error.response?.data?.message || 'Gagal mengubah password'
             };
         }
     };
@@ -75,6 +116,7 @@ export const AuthProvider = ({ children }) => {
         user,
         login,
         logout,
+        changePassword,
         isAuthenticated: !!user
     };
 

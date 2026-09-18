@@ -52,23 +52,38 @@ router.post('/login', authController.login);
 
 /**
  * @swagger
- * /auth/logout:
- *   post:
- *     summary: User Logout
+ * /auth/first-login-change-password:
+ *   put:
+ *     summary: Change Password on First Login (no token required)
  *     tags: [Auth]
- *     security:
- *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - old_password
+ *               - new_password
+ *             properties:
+ *               username:
+ *                 type: string
+ *               old_password:
+ *                 type: string
+ *               new_password:
+ *                 type: string
  *     responses:
  *       200:
- *         description: Logout successful
+ *         description: Password changed successfully
  */
-router.post('/logout', verifyToken, authController.logout);
+router.put('/first-login-change-password', authController.firstLoginChangePassword);
 
 /**
  * @swagger
  * /auth/change-password:
  *   put:
- *     summary: Change Password
+ *     summary: Change Password (requires token)
  *     tags: [Auth]
  *     security:
  *       - bearerAuth: []
@@ -91,6 +106,20 @@ router.post('/logout', verifyToken, authController.logout);
  *         description: Password changed successfully
  */
 router.put('/change-password', verifyToken, authController.changePassword);
+
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: User Logout
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logout successful
+ */
+router.post('/logout', verifyToken, authController.logout);
 
 /**
  * @swagger

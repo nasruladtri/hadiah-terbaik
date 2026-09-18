@@ -23,7 +23,17 @@ const Login = () => {
         try {
             const result = await login(username, password);
             if (result.success) {
-                navigate('/');
+                if (result.must_change_password) {
+                    navigate('/auth/change-password', {
+                        state: {
+                            user_id: result.user_id,
+                            username: result.username
+                        },
+                        replace: true
+                    });
+                } else {
+                    navigate('/');
+                }
             } else {
                 setError(result.message);
                 setPassword('');

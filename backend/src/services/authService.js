@@ -195,9 +195,78 @@ const changePassword = async (userId, oldPassword, newPassword) => {
     };
 };
 
+/**
+ * Change password on first login (no token required)
+ * Uses username + old_password for verification
+ */
+const firstLoginChangePassword = async (username, oldPassword, newPassword) => {
+    // Get user by username
+    const user = await prisma.user.findUnique({
+        where: { username }
+    });
+
+    if (!user) {
+        logPasswordEvent(null, 'FIRST_LOGIN_PASSWORD_CHANGE_FAILED', { reason: 'User not found', username });
+        throw new Error('User tidak ditemukan');
+    }
+
+    // Verify old password
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+        logPasswordEvent(user.id, 'FIRST_LOGIN_PASSWORD_CHANGE_FAILED', { reason: 'Wrong old password', username });
+        throw new Error('Password lama tidak sesuai');
+    }
+
+    // Check if user actually needs password change
+    if (!user.must_change_password) {
+        throw new Error('Password tidak perlu diubah');
+    }
+
+    // Validate new password complexity
+    const validation = validatePassword(newPassword);
+    if (!validation.valid) {
+        const errorMessage = validation.errors.join(', ');
+        logPasswordEvent(user.id, 'FIRST_LOGIN_PASSWORD_CHANGE_FAILED', { reason: 'Weak password', errors: validation.errors, username });
+        throw new Error(errorMessage);
+    }
+
+    // Check if password is common
+    if (isCommonPassword(newPassword)) {
+        logPasswordEvent(user.id, 'FIRST_LOGIN_PASSWORD_CHANGE_FAILED', { reason: 'Common password', username });
+        throw new Error('Password terlalu umum. Gunakan password yang lebih unik dan sulit ditebak');
+    }
+
+    // Check if new password is same as old
+    if (oldPassword === newPassword) {
+        throw new Error('Password baru harus berbeda dengan password lama');
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password and reset must_change_password flag
+    await prisma.user.update({
+        where: { id: user.id },
+        data: {
+            password: hashedPassword,
+            password_changed_at: new Date(),
+            must_change_password: false
+        }
+    });
+
+    logPasswordEvent(user.id, 'FIRST_LOGIN_PASSWORD_CHANGE_SUCCESS', { username: user.username });
+    logger.info(`First login password changed successfully for user: ${user.username}`);
+
+    return {
+        success: true,
+        message: 'Password berhasil diubah. Silakan login kembali dengan password baru Anda'
+    };
+};
+
 module.exports = {
     login,
     getMe,
     logout,
-    changePassword
+    changePassword,
+    firstLoginChangePassword
 };
